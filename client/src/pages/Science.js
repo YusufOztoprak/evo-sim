@@ -11,7 +11,7 @@ function Highlight({ children }) {
     return (_jsx("span", { className: "text-primary font-semibold not-italic", children: children }));
 }
 function Formula({ children }) {
-    return (_jsx("div", { className: "my-4 p-4 rounded-xl bg-surface border border-border font-mono text-sm text-cyan overflow-x-auto", children: children }));
+    return (_jsx("div", { className: "my-5 flex justify-center", children: _jsx("div", { className: "inline-block px-6 py-3 rounded-xl bg-bg border border-cyan/20 font-mono text-sm text-cyan tracking-wide shadow-[0_0_20px_rgba(6,182,212,0.08)]", children: children }) }));
 }
 function Callout({ title, children }) {
     return (_jsxs("div", { className: "my-6 p-5 rounded-xl bg-primary/5 border border-primary/20", children: [_jsx("p", { className: "text-primary font-semibold text-sm mb-1", children: title }), _jsx("p", { className: "text-dim text-sm", children: children })] }));
