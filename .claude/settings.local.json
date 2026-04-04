@@ -3,7 +3,8 @@
     "allow": [
       "Read(//mnt/c/Users/yusuf/WebstormProjects/**)",
       "Bash(npm install:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(curl:*)"
     ]
   }
 }
