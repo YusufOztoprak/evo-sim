@@ -368,7 +368,7 @@ function OrganismRow({ org, rank, maxFitness, minFitness }: {
         <div className="flex items-center justify-between text-xs mb-1 gap-2">
           <button
             onClick={() => setExpanded(v => !v)}
-            className="font-mono text-dim text-left hover:text-cyan transition-colors truncate"
+            className={`font-mono text-dim text-left hover:text-cyan transition-colors ${expanded ? 'break-all whitespace-normal' : 'truncate'}`}
           >
             [{expanded ? full : preview}{!expanded && org.genome.length > 5 ? '…' : ''}]
           </button>
