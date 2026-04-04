@@ -364,7 +364,10 @@ function OrganismRow({ org, rank, maxFitness, minFitness }: {
       <span className="text-xs text-muted w-5 font-mono text-right">{rank}</span>
       <div className="flex-1">
         <div className="flex items-center justify-between text-xs mb-1">
-          <span className="font-mono text-dim truncate max-w-[140px]">
+          <span
+            className="font-mono text-dim truncate max-w-[140px] cursor-help"
+            title={`[${org.genome.map(g => Number(g).toFixed(2)).join(', ')}]`}
+          >
             [{org.genome.slice(0, 5).map(g => Number(g).toFixed(2)).join(', ')}{org.genome.length > 5 ? '…' : ''}]
           </span>
           <span className="text-primary font-semibold">{org.fitness.toFixed(5)}</span>
