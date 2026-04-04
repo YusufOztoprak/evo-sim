@@ -80,7 +80,7 @@ export default function Landing() {
         {/* Radial gradient overlay */}
         <div className="absolute inset-0 bg-gradient-radial from-transparent via-bg/60 to-bg pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -147,7 +147,7 @@ export default function Landing() {
       </section>
 
       {/* ── Features ── */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
+      <section className="max-w-7xl mx-auto px-6 py-16">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -183,7 +183,7 @@ export default function Landing() {
 
       {/* ── How it works ── */}
       <section className="bg-surface/30 border-y border-border">
-        <div className="max-w-7xl mx-auto px-6 py-24">
+        <div className="max-w-7xl mx-auto px-6 py-16">
           <motion.div
             variants={stagger}
             initial="hidden"
@@ -212,7 +212,7 @@ export default function Landing() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="max-w-7xl mx-auto px-6 py-24 text-center">
+      <section className="max-w-7xl mx-auto px-6 py-16 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}

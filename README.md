@@ -9,6 +9,8 @@ A production-grade full-stack system that simulates **biological evolution** usi
 
 **[→ Live Demo](https://evo-sim-ten.vercel.app)** · **[→ API](https://evo-sim-production.up.railway.app/health)**
 
+> **Note:** The API is hosted on Railway's free tier. The first request after a period of inactivity may take ~15–30 seconds while the server cold-starts. Subsequent requests are fast.
+
 ---
 
 ## What it does
