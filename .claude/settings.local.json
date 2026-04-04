@@ -5,7 +5,12 @@
       "Bash(npm install:*)",
       "Bash(npm run:*)",
       "Bash(curl:*)",
-      "Bash(python -m json.tool)"
+      "Bash(python -m json.tool)",
+      "Bash(wait)",
+      "Bash(python -c ':*)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(f'total={d[\\\\\"meta\\\\\"][\\\\\"total\\\\\"]} pages={d[\\\\\"meta\\\\\"][\\\\\"totalPages\\\\\"]} returned={len\\(d[\\\\\"data\\\\\"]\\)}'\\)\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(f'completed sims: {len\\(d[\\\\\"data\\\\\"]\\)}'\\)\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(f'Lineage depth: {len\\(d[\\\\\"data\\\\\"]\\)} ancestors'\\)\")"
     ]
   }
 }

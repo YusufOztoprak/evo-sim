@@ -1,5 +1,8 @@
 import { Types } from 'mongoose';
 import { Simulation } from '../models/Simulation';
+import { Generation } from '../models/Generation';
+import { Organism } from '../models/Organism';
+import { Species } from '../models/Species';
 import type { ISimulation, SimulationConfig, SimulationStatus, PaginationQuery } from '../types';
 
 // ─── Create ───────────────────────────────────────────────────────────────────
@@ -72,5 +75,12 @@ export async function incrementGeneration(
 export async function deleteSimulation(id: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
     const result = await Simulation.findByIdAndDelete(id);
-    return result !== null;
+    if (!result) return false;
+    // Cascade — remove all related documents
+    await Promise.all([
+        Generation.deleteMany({ simulationId: id }),
+        Organism.deleteMany({ simulationId: id }),
+        Species.deleteMany({ simulationId: id }),
+    ]);
+    return true;
 }

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { connectDb } from '../db';
 import { errorHandler } from './middleware/errorHandler';
@@ -20,6 +21,9 @@ async function bootstrap(): Promise<void> {
     await connectDb();
 
     const app = express();
+
+    // ── Security headers ──────────────────────────────────────────────────────
+    app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
     // ── CORS ──────────────────────────────────────────────────────────────────
     app.use(cors({
