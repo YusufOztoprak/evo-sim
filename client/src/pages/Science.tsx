@@ -42,8 +42,10 @@ function Highlight({ children }: { children: React.ReactNode }) {
 
 function Formula({ children }: { children: React.ReactNode }) {
   return (
-    <div className="my-4 p-4 rounded-xl bg-surface border border-border font-mono text-sm text-cyan overflow-x-auto">
-      {children}
+    <div className="my-5 flex justify-center">
+      <div className="inline-block px-6 py-3 rounded-xl bg-bg border border-cyan/20 font-mono text-sm text-cyan tracking-wide shadow-[0_0_20px_rgba(6,182,212,0.08)]">
+        {children}
+      </div>
     </div>
   );
 }
