@@ -357,7 +357,24 @@ export default function Science() {
               a new species is created.
             </p>
             <Formula>
-              {'distance(a, b) = Hamming(a,b)/len  [binary]  |  √Σ(aᵢ−bᵢ)²/len  [real]'}
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+                <span>
+                  <span className="text-purple text-xs uppercase tracking-widest mr-2">binary</span>
+                  d(a,b) = Hamming(a,b) / len
+                </span>
+                <span className="text-muted hidden sm:block">|</span>
+                <span>
+                  <span className="text-purple text-xs uppercase tracking-widest mr-2">real</span>
+                  d(a,b) ={' '}
+                  <span className="inline-flex items-start gap-0.5">
+                    <span className="text-lg leading-none">√</span>
+                    <span className="border-t border-cyan px-0.5">
+                      Σ(aᵢ − bᵢ)²
+                    </span>
+                  </span>
+                  {' '}/ len
+                </span>
+              </div>
             </Formula>
             <p className="mt-3">
               Species that haven't been observed for two or more generations are marked

@@ -355,22 +355,24 @@ function StatCard({ icon: Icon, label, value, color, mono = false }: {
 function OrganismRow({ org, rank, maxFitness, minFitness }: {
   org: IOrganism; rank: number; maxFitness: number; minFitness: number;
 }) {
-  // Normalise fitness to [0,1] relative to this page's top organisms
+  const [expanded, setExpanded] = useState(false);
   const range = maxFitness - minFitness;
   const pct   = range === 0 ? 100 : Math.round(((org.fitness - minFitness) / range) * 100);
+  const preview = org.genome.slice(0, 5).map(g => Number(g).toFixed(2)).join(', ');
+  const full    = org.genome.map(g => Number(g).toFixed(2)).join(', ');
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-muted w-5 font-mono text-right">{rank}</span>
-      <div className="flex-1">
-        <div className="flex items-center justify-between text-xs mb-1">
-          <span
-            className="font-mono text-dim truncate max-w-[140px] cursor-help"
-            title={`[${org.genome.map(g => Number(g).toFixed(2)).join(', ')}]`}
+    <div className="flex items-start gap-3">
+      <span className="text-xs text-muted w-5 font-mono text-right mt-1">{rank}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between text-xs mb-1 gap-2">
+          <button
+            onClick={() => setExpanded(v => !v)}
+            className="font-mono text-dim text-left hover:text-cyan transition-colors truncate"
           >
-            [{org.genome.slice(0, 5).map(g => Number(g).toFixed(2)).join(', ')}{org.genome.length > 5 ? '…' : ''}]
-          </span>
-          <span className="text-primary font-semibold">{org.fitness.toFixed(5)}</span>
+            [{expanded ? full : preview}{!expanded && org.genome.length > 5 ? '…' : ''}]
+          </button>
+          <span className="text-primary font-semibold flex-shrink-0">{org.fitness.toFixed(5)}</span>
         </div>
         <div className="h-1 bg-border rounded-full overflow-hidden">
           <div
