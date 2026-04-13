@@ -52,7 +52,7 @@ export function tick(
     evaluated.sort((a, b) => b.fitness - a.fitness);
 
     // 3. Elitism — carry top N forward unchanged (preserve original ancestry)
-    const elites = evaluated.slice(0, config.elitismCount).map((o) => ({ ...o }));
+    const elites = evaluated.slice(0, config.elitismCount).map((o) => ({ ...o, id: new Types.ObjectId().toHexString() }));
 
     // 4. Fill the rest of the next generation via selection + crossover + mutation
     const offspring: OrganismPlain[] = [];
