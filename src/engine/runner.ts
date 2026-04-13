@@ -163,20 +163,27 @@ export function createInitialPopulation(config: SimulationConfig): OrganismPlain
     const genomes = initPopulation(config);
     const fitnessFn = getFitnessFunction(config.fitnessFunctionId);
     const envParams = resolveEnvParams(config.environmentParams, config.dynamicEnv, 0);
-    return genomes.map((genome) => {
+    const organisms = genomes.map((genome) => {
         try {
-            return {
-                id:      new Types.ObjectId().toHexString(),
-                genome,
-                fitness: fitnessFn.evaluate(genome, envParams),
-            };
+            const fitness = fitnessFn.evaluate(genome, envParams);
+            if (!Number.isFinite(fitness)) {
+                console.error(
+                    '[runner.createInitialPopulation] non-finite fitness',
+                    { fitnessFunctionId: config.fitnessFunctionId, genome, envParams, fitness },
+                );
+            }
+            return { id: new Types.ObjectId().toHexString(), genome, fitness };
         } catch (err) {
             console.error(
-                '[runner.createInitialPopulation] fitness evaluation failed',
+                '[runner.createInitialPopulation] fitness evaluation threw',
                 { fitnessFunctionId: config.fitnessFunctionId, genome, envParams },
                 err,
             );
             throw err;
         }
     });
+    console.log(
+        `[runner.createInitialPopulation] sample fitness[0]=${organisms[0]?.fitness} envParams=${JSON.stringify(envParams)}`,
+    );
+    return organisms;
 }

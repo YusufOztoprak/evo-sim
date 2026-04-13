@@ -67,7 +67,7 @@ registry.set('survival', {
     id:          'survival',
     label:       'Survival Fitness',
     description: 'Organism traits (speed, vision, camouflage, energy) evaluated against environment pressure, with trade-off penalties for over-investment.',
-    evaluate(genome: Genome, params: Record<string, number>): number {
+    evaluate(genome: Genome, params: Record<string, number> = {}): number {
         const speed      = clamp01(genome[0] ?? 0.5);
         const vision     = clamp01(genome[1] ?? 0.5);
         const camouflage = clamp01(genome[2] ?? 0.5);
