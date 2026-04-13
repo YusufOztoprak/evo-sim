@@ -126,10 +126,12 @@ describe('tick', () => {
     });
 
     it('shouldStop is true when targetFitness is reached', () => {
+        // genome [0, 1, 0.5, 1] scores ~0.93 with the survival function
+        // (total investment = 2.5 — no budget penalty; zero speed avoids energy cost)
         const highFitPop: OrganismPlain[] = Array.from({ length: 10 }, (_, i) => ({
             id: `org-${i}`,
-            genome: [1, 1, 1, 1],
-            fitness: 0.99,
+            genome: [0, 1, 0.5, 1],
+            fitness: 0,
         }));
         const result = tick({ ...baseCfg, targetFitness: 0.9 }, 0, highFitPop);
         expect(result.shouldStop).toBe(true);

@@ -46,20 +46,27 @@ registry.set('sphere', {
 });
 
 /**
- * Survival — biologically inspired fitness.
+ * Survival — biologically inspired fitness with trait trade-offs.
  * Genome layout: [speed, vision, camouflage, energy, ...extras ignored]
  * Environment params: temperature (0–1), foodAvailability (0–1), predatorPressure (0–1)
  *
- * Design rationale:
- *   - Temperature stress is buffered by the energy gene.
- *   - Food scarcity is offset by energy reserves.
- *   - Predator pressure is reduced by camouflage (60 %) and speed (40 %).
- *   - Vision provides a flat foraging bonus.
+ * Trade-off model (life-history theory):
+ *   - Total trait investment is capped at TRAIT_BUDGET (default 2.5 out of 4.0 max).
+ *     Excess investment is taxed proportionally, so [1,1,1,1] is sub-optimal.
+ *   - Speed and energy compete directly: locomotion is metabolically expensive.
+ *     High speed reduces effective energy by SPEED_ENERGY_COST * speed.
+ *   - Vision and camouflage trade against each other: bright eyes break crypsis.
+ *     Effective camouflage = camouflage * (1 − VISION_CAMO_CONFLICT * vision).
  */
+const TRAIT_BUDGET          = 2.5;  // "affordable" total investment
+const BUDGET_PENALTY_SCALE  = 0.4;  // how sharply over-investment is punished
+const SPEED_ENERGY_COST     = 0.35; // fraction of speed subtracted from effective energy
+const VISION_CAMO_CONFLICT  = 0.3;  // fraction of vision that degrades camouflage
+
 registry.set('survival', {
     id:          'survival',
     label:       'Survival Fitness',
-    description: 'Organism traits (speed, vision, camouflage, energy) evaluated against environment pressure.',
+    description: 'Organism traits (speed, vision, camouflage, energy) evaluated against environment pressure, with trade-off penalties for over-investment.',
     evaluate(genome: Genome, params: Record<string, number>): number {
         const speed      = clamp01(genome[0] ?? 0.5);
         const vision     = clamp01(genome[1] ?? 0.5);
@@ -70,18 +77,30 @@ registry.set('survival', {
         const foodAvailability = clamp01(params['foodAvailability'] ?? 0.5);
         const predatorPressure = clamp01(params['predatorPressure'] ?? 0.3);
 
-        // Thermal tolerance: divergence from optimal 0.5 costs energy
-        const tempFit  = 1 - Math.abs(temperature - 0.5) * 2 * (1 - energy);
+        // ── Trade-off 1: locomotion costs metabolic energy ────────────────────
+        const effectiveEnergy = clamp01(energy - SPEED_ENERGY_COST * speed);
 
-        // Foraging: high energy reserves compensate for scarce food
-        const foodFit  = foodAvailability + energy * (1 - foodAvailability);
+        // ── Trade-off 2: high vision breaks camouflage (reflective eyes) ──────
+        const effectiveCamo = clamp01(camouflage * (1 - VISION_CAMO_CONFLICT * vision));
 
-        // Predator evasion: camouflage is primary, speed is secondary
-        const predFit  = 1 - predatorPressure * (1 - 0.6 * camouflage - 0.4 * speed);
+        // ── Budget penalty: total investment above TRAIT_BUDGET is taxed ──────
+        const totalInvestment = speed + vision + camouflage + energy;
+        const excess          = Math.max(0, totalInvestment - TRAIT_BUDGET);
+        const budgetPenalty   = 1 - BUDGET_PENALTY_SCALE * (excess / (4 - TRAIT_BUDGET));
+
+        // ── Environmental pressures ───────────────────────────────────────────
+        // Thermal tolerance: divergence from optimal 0.5 costs effective energy
+        const tempFit  = 1 - Math.abs(temperature - 0.5) * 2 * (1 - effectiveEnergy);
+
+        // Foraging: effective energy reserves compensate for scarce food
+        const foodFit  = foodAvailability + effectiveEnergy * (1 - foodAvailability);
+
+        // Predator evasion: effective camouflage is primary, speed is secondary
+        const predFit  = 1 - predatorPressure * (1 - 0.6 * effectiveCamo - 0.4 * speed);
 
         const visionBonus = 0.1 * vision;
 
-        return Math.max(0, tempFit * 0.3 + foodFit * 0.3 + predFit * 0.3 + visionBonus);
+        return Math.max(0, (tempFit * 0.3 + foodFit * 0.3 + predFit * 0.3 + visionBonus) * budgetPenalty);
     },
 });
 

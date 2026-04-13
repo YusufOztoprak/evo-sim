@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Dna, GitBranch, Shuffle, Target, BarChart3,
-  ArrowRight, Zap, Globe, TrendingUp
+  ArrowRight, Zap, Globe, TrendingUp, FlaskConical
 } from 'lucide-react';
 
 const fade    = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
@@ -67,6 +67,7 @@ const toc = [
   { id: 'crossover',          label: 'Crossover' },
   { id: 'mutation',           label: 'Mutation' },
   { id: 'speciation',         label: 'Speciation' },
+  { id: 'model-limitations',  label: 'Model Limitations' },
   { id: 'applications',       label: 'Real-world Applications' },
 ];
 
@@ -381,6 +382,54 @@ export default function Science() {
               <span className="text-red-400 font-semibold"> extinct</span>. The analytics
               dashboard tracks active vs. extinct species over time — a signal of population diversity.
             </p>
+          </Section>
+
+          <Section id="model-limitations" icon={FlaskConical} color="text-yellow-400 border-yellow-400/20 bg-yellow-400/10" title="Model Limitations">
+            <h2 className="text-2xl font-bold text-text mb-3">What This Simulator Does — and Doesn't — Model</h2>
+            <p>
+              EvoSim is a <Highlight>genetic algorithm engine</Highlight>, not a biological simulator.
+              The survival fitness function uses biological labels (speed, vision, camouflage, energy),
+              but its design reflects the priorities of an optimisation benchmark, not evolutionary biology.
+              Three specific simplifications are worth understanding:
+            </p>
+
+            <div className="mt-6 space-y-4">
+              <div className="p-4 rounded-xl bg-surface border border-yellow-400/20">
+                <div className="font-semibold text-text text-sm mb-1">No trait trade-offs</div>
+                <p className="text-xs">
+                  Traits contribute additively — a genome of [1, 1, 1, 1] is always the global optimum.
+                  In real organisms, speed requires metabolic energy, large eyes consume neural resources,
+                  and camouflage conflicts with mate-signalling pigmentation. There is no budget constraint
+                  that makes it impossible to maximise all traits simultaneously.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface border border-yellow-400/20">
+                <div className="font-semibold text-text text-sm mb-1">No frequency-dependent selection</div>
+                <p className="text-xs">
+                  A genome's fitness depends only on its own trait values and the environment — not on what
+                  the rest of the population looks like. In real ecosystems, when camouflage becomes
+                  ubiquitous, predators adapt and the advantage erodes. Common strategies become targets;
+                  rare strategies gain an edge. This dynamic is absent here.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-surface border border-yellow-400/20">
+                <div className="font-semibold text-text text-sm mb-1">Static fitness landscape by default</div>
+                <p className="text-xs">
+                  Unless <em>Dynamic Environment</em> is enabled, the optimal genome is fixed from
+                  generation 0. The population performs hill-climbing toward a stationary target.
+                  Real environments shift continuously — a trait that is advantageous today may be neutral
+                  or harmful tomorrow. Enable dynamic environment mode to approximate a moving landscape.
+                </p>
+              </div>
+            </div>
+
+            <Callout title="Why this matters">
+              These are design decisions, not bugs. GAs are mathematical optimisation tools first.
+              Calling the variables "speed" and "camouflage" makes the output more interpretable,
+              but the engine's job is to find high-fitness genomes — not to faithfully reproduce
+              evolutionary dynamics. Adding a trait budget or frequency-dependent selection would
+              change that balance, and remains an open direction for this project.
+            </Callout>
           </Section>
 
           <Section id="applications" icon={Globe} color="text-cyan border-cyan/20 bg-cyan/10" title="Real-world Applications">

@@ -109,4 +109,26 @@ describe('survival', () => {
         const lowVision  = fn.evaluate([0.5, 0.0, 0.5, 0.5], env);
         expect(highVision).toBeGreaterThan(lowVision);
     });
+
+    // ── Trade-off tests ───────────────────────────────────────────────────────
+
+    it('all-max genome [1,1,1,1] is NOT the global optimum (budget penalty)', () => {
+        const allMax     = fn.evaluate([1.0, 1.0, 1.0, 1.0], env);
+        const balanced   = fn.evaluate([0.6, 0.6, 0.6, 0.7], env); // total = 2.5, at budget
+        expect(balanced).toBeGreaterThan(allMax);
+    });
+
+    it('high speed reduces effective energy under food scarcity', () => {
+        // Same total investment, but fast organism burns more energy
+        const fastHungry = fn.evaluate([1.0, 0.0, 0.0, 0.5], { ...env, foodAvailability: 0.0 });
+        const slowHungry = fn.evaluate([0.0, 0.0, 0.0, 0.5], { ...env, foodAvailability: 0.0 });
+        expect(slowHungry).toBeGreaterThan(fastHungry);
+    });
+
+    it('high vision degrades camouflage effectiveness under predator pressure', () => {
+        // Same camouflage gene value, but high-vision organism is more visible
+        const highVisHighCam = fn.evaluate([0.5, 1.0, 1.0, 0.5], { ...env, predatorPressure: 1.0 });
+        const noVisHighCam   = fn.evaluate([0.5, 0.0, 1.0, 0.5], { ...env, predatorPressure: 1.0 });
+        expect(noVisHighCam).toBeGreaterThan(highVisHighCam);
+    });
 });
