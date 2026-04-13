@@ -35,10 +35,18 @@ export function tick(
     );
 
     // 1. Evaluate fitness for every organism
-    const evaluated = population.map((org) => ({
-        ...org,
-        fitness: fitnessFn.evaluate(org.genome, envParams),
-    }));
+    const evaluated = population.map((org) => {
+        try {
+            return { ...org, fitness: fitnessFn.evaluate(org.genome, envParams) };
+        } catch (err) {
+            console.error(
+                '[runner.tick] fitness evaluation failed',
+                { fitnessFunctionId: config.fitnessFunctionId, genome: org.genome, envParams },
+                err,
+            );
+            throw err;
+        }
+    });
 
     // 2. Sort descending by fitness (required by rank & elitist selection)
     evaluated.sort((a, b) => b.fitness - a.fitness);
@@ -155,9 +163,20 @@ export function createInitialPopulation(config: SimulationConfig): OrganismPlain
     const genomes = initPopulation(config);
     const fitnessFn = getFitnessFunction(config.fitnessFunctionId);
     const envParams = resolveEnvParams(config.environmentParams, config.dynamicEnv, 0);
-    return genomes.map((genome) => ({
-        id:      new Types.ObjectId().toHexString(),
-        genome,
-        fitness: fitnessFn.evaluate(genome, envParams),
-    }));
+    return genomes.map((genome) => {
+        try {
+            return {
+                id:      new Types.ObjectId().toHexString(),
+                genome,
+                fitness: fitnessFn.evaluate(genome, envParams),
+            };
+        } catch (err) {
+            console.error(
+                '[runner.createInitialPopulation] fitness evaluation failed',
+                { fitnessFunctionId: config.fitnessFunctionId, genome, envParams },
+                err,
+            );
+            throw err;
+        }
+    });
 }
