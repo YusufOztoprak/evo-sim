@@ -12,8 +12,8 @@ const OrganismSchema = new Schema<IOrganism>(
         fitness:           { type: Number, required: true, default: 0 },
         normalizedFitness: { type: Number },
         rank:              { type: Number },
-        parentAId:         { type: String, ref: 'Organism' },
-        parentBId:         { type: String, ref: 'Organism' },
+        parentAId:         { type: Schema.Types.ObjectId, ref: 'Organism' },
+        parentBId:         { type: Schema.Types.ObjectId, ref: 'Organism' },
         survived:          { type: Boolean, default: false },
     },
     { timestamps: { createdAt: true, updatedAt: false } }

@@ -11,13 +11,15 @@ export async function insertOrganisms(
     organisms: OrganismPlain[]
 ): Promise<void> {
     const docs = organisms.map((o) => ({
+        _id:        new Types.ObjectId(o.id),
         simulationId,
         generationId,
-        genome:    o.genome,
-        fitness:   o.fitness,
-        parentAId: o.parentAId,
-        parentBId: o.parentBId,
-        survived:  false,
+        genome:     o.genome,
+        fitness:    o.fitness,
+        speciesId:  o.speciesId,
+        parentAId:  o.parentAId ? new Types.ObjectId(o.parentAId) : undefined,
+        parentBId:  o.parentBId ? new Types.ObjectId(o.parentBId) : undefined,
+        survived:   false,
     }));
     await Organism.insertMany(docs, { ordered: false });
 }
@@ -57,19 +59,32 @@ export async function findLineage(
     organismId: string,
     maxDepth = 10
 ): Promise<IOrganism[]> {
-    const lineage: IOrganism[] = [];
-    let currentId: string | undefined = organismId;
-    let depth = 0;
+    if (!Types.ObjectId.isValid(organismId)) return [];
 
-    while (currentId && depth < maxDepth) {
-        const org = await findOrganismById(currentId);
-        if (!org) break;
-        lineage.push(org);
-        currentId = org.parentAId;
-        depth++;
-    }
+    // Single aggregation pipeline — no N+1
+    const rows = await Organism.aggregate([
+        { $match: { _id: new Types.ObjectId(organismId) } },
+        {
+            $graphLookup: {
+                from:             'organisms',
+                startWith:        '$parentAId',
+                connectFromField: 'parentAId',
+                connectToField:   '_id',
+                as:               '_ancestors',
+                maxDepth:         maxDepth - 1,
+                depthField:       '_depth',
+            },
+        },
+    ]);
 
-    return lineage;
+    if (!rows.length) return [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { _ancestors, ...root } = rows[0];
+    const ancestors: Array<Record<string, unknown>> = rows[0]._ancestors ?? [];
+    ancestors.sort((a, b) => (a._depth as number) - (b._depth as number));
+
+    return [root, ...ancestors].map(({ _ancestors: _a, _depth: _d, ...doc }) => doc as unknown as IOrganism);
 }
 
 // ─── Aggregation ──────────────────────────────────────────────────────────────
@@ -81,5 +96,6 @@ export async function getGenomeDistribution(
     return Organism
         .find({ generationId })
         .select('fitness genome')
+        .limit(500)
         .lean() as Promise<Array<{ fitness: number; genome: number[] }>>;
 }

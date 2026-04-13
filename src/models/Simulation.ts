@@ -3,6 +3,24 @@ import type { ISimulation, SimulationConfig } from '../types';
 
 export type SimulationDocument = HydratedDocument<ISimulation>;
 
+const EnvKeyframeSchema = new Schema(
+    {
+        generation: { type: Number, required: true },
+        params:     { type: Map, of: Number, required: true },
+    },
+    { _id: false }
+);
+
+const DynamicEnvSchema = new Schema(
+    {
+        enabled:       { type: Boolean, default: false },
+        shiftMode:     { type: String, enum: ['gradual', 'abrupt'], default: 'gradual' },
+        shiftInterval: { type: Number, min: 1, default: 20 },
+        keyframes:     { type: [EnvKeyframeSchema], default: [] },
+    },
+    { _id: false }
+);
+
 const SimulationConfigSchema = new Schema<SimulationConfig>(
     {
         populationSize:    { type: Number, required: true, min: 2, max: 100_000 },
@@ -19,6 +37,7 @@ const SimulationConfigSchema = new Schema<SimulationConfig>(
         targetFitness:     { type: Number },
         fitnessFunctionId: { type: String, required: true },
         environmentParams: { type: Map, of: Number, default: {} },
+        dynamicEnv:        { type: DynamicEnvSchema },
     },
     { _id: false }
 );

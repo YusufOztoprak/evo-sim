@@ -12,9 +12,10 @@ const GenerationSchema = new Schema<IGeneration>(
         maxFitness:       { type: Number, required: true },
         minFitness:       { type: Number, required: true },
         fitnessVariance:  { type: Number, required: true },
-        diversityScore:   { type: Number, required: true, min: 0, max: 1 },
-        speciesCount:     { type: Number, default: 1 },
-        elapsedMs:        { type: Number, required: true },
+        diversityScore:    { type: Number, required: true, min: 0, max: 1 },
+        speciesCount:      { type: Number, default: 1 },
+        elapsedMs:         { type: Number, required: true },
+        environmentParams: { type: Map, of: Number },
     },
     { timestamps: { createdAt: true, updatedAt: false } }
 );

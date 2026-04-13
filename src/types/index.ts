@@ -13,6 +13,32 @@ export type SimulationStatus   = 'idle' | 'running' | 'paused' | 'completed' | '
 export type SelectionStrategy  = 'tournament' | 'roulette' | 'rank' | 'elitist';
 export type CrossoverStrategy  = 'single_point' | 'two_point' | 'uniform' | 'arithmetic';
 
+// ─── Dynamic environment ──────────────────────────────────────────────────────
+
+/** A single waypoint in a dynamic environment timeline. */
+export interface EnvKeyframe {
+    /** Generation at which this target environment becomes the "from" state. */
+    generation: number;
+    params:     Record<string, number>;
+}
+
+/**
+ * Configuration for shifting environment parameters over time.
+ * If `enabled` is false (or omitted) the static `environmentParams` are used.
+ */
+export interface DynamicEnvConfig {
+    enabled:       boolean;
+    /** 'abrupt' snaps instantly; 'gradual' lerps between keyframes. */
+    shiftMode:     'gradual' | 'abrupt';
+    /** Auto-generate a new random keyframe every N generations (ignored when keyframes are explicit). */
+    shiftInterval: number;
+    /**
+     * Explicit waypoints, sorted ascending by generation.
+     * Populated automatically at simulation-start when omitted.
+     */
+    keyframes?:    EnvKeyframe[];
+}
+
 // ─── Simulation ───────────────────────────────────────────────────────────────
 
 export interface SimulationConfig {
@@ -30,6 +56,8 @@ export interface SimulationConfig {
     targetFitness?:    number;
     fitnessFunctionId: string;
     environmentParams: Record<string, number>;
+    /** Omit or set `enabled: false` to keep static environment behaviour. */
+    dynamicEnv?:       DynamicEnvConfig;
 }
 
 export interface ISimulation {
@@ -65,18 +93,20 @@ export interface IOrganism {
 // ─── Generation ───────────────────────────────────────────────────────────────
 
 export interface IGeneration {
-    _id:              string;
-    simulationId:     string;
-    generationNumber: number;
-    populationSize:   number;
-    avgFitness:       number;
-    maxFitness:       number;
-    minFitness:       number;
-    fitnessVariance:  number;
-    diversityScore:   number;
-    speciesCount:     number;
-    elapsedMs:        number;
-    createdAt:        Date;
+    _id:               string;
+    simulationId:      string;
+    generationNumber:  number;
+    populationSize:    number;
+    avgFitness:        number;
+    maxFitness:        number;
+    minFitness:        number;
+    fitnessVariance:   number;
+    diversityScore:    number;
+    speciesCount:      number;
+    elapsedMs:         number;
+    /** Environment parameters in effect during this generation (for timeline visualisation). */
+    environmentParams?: Record<string, number>;
+    createdAt:         Date;
 }
 
 // ─── Species ──────────────────────────────────────────────────────────────────
@@ -97,18 +127,21 @@ export interface ISpecies {
 // ─── Engine I/O (pure — no DB types) ─────────────────────────────────────────
 
 export interface OrganismPlain {
-    id:        string;
-    genome:    Genome;
-    fitness:   number;
+    id:         string;
+    genome:     Genome;
+    fitness:    number;
+    speciesId?: string;
     parentAId?: string;
     parentBId?: string;
 }
 
 export interface TickResult {
-    generation: number;
-    population: OrganismPlain[];
-    stats:      GenerationStats;
-    shouldStop: boolean;
+    generation:        number;
+    population:        OrganismPlain[];
+    stats:             GenerationStats;
+    shouldStop:        boolean;
+    /** Resolved environment params actually used during this tick (after any dynamic shift). */
+    environmentParams: Record<string, number>;
 }
 
 export interface GenerationStats {

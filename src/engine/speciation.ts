@@ -7,7 +7,7 @@ import type { Genome, ISpecies } from '../types';
  * Binary / permutation: normalised Hamming.
  * Real / integer: normalised Euclidean (divided by sqrt(length) to keep [0,1] roughly).
  */
-function genomeDistance(a: Genome, b: Genome): number {
+export function genomeDistance(a: Genome, b: Genome): number {
     const len = Math.min(a.length, b.length);
     if (len === 0) return 0;
 

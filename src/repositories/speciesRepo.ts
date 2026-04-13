@@ -7,17 +7,18 @@ import type { ISpecies, Genome } from '../types';
 export async function createSpecies(
   simulationId: string,
   representativeGenome: Genome,
-  firstSeenGeneration: number
+  firstSeenGeneration: number,
+  label?: string,
 ): Promise<ISpecies> {
-  const count = await Species.countDocuments({ simulationId });
+  const resolvedLabel = label ?? `species-${await Species.countDocuments({ simulationId }) + 1}`;
   const doc = await Species.create({
     simulationId,
-    label: `species-${count + 1}`,
+    label:                resolvedLabel,
     representativeGenome,
-    memberCount: 1,
+    memberCount:          1,
     firstSeenGeneration,
-    lastSeenGeneration: firstSeenGeneration,
-    isExtinct: false,
+    lastSeenGeneration:   firstSeenGeneration,
+    isExtinct:            false,
   });
   return doc.toObject();
 }

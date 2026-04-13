@@ -76,11 +76,12 @@ export async function deleteSimulation(id: string): Promise<boolean> {
     if (!Types.ObjectId.isValid(id)) return false;
     const result = await Simulation.findByIdAndDelete(id);
     if (!result) return false;
-    // Cascade — remove all related documents
+    // Cascade — remove all related documents. Errors are logged but not re-thrown:
+    // the simulation itself is already deleted so returning false would be misleading.
     await Promise.all([
         Generation.deleteMany({ simulationId: id }),
         Organism.deleteMany({ simulationId: id }),
         Species.deleteMany({ simulationId: id }),
-    ]);
+    ]).catch((err) => console.error(`[deleteSimulation] cascade failed for ${id}:`, err));
     return true;
 }

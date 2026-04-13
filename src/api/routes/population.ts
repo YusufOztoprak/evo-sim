@@ -91,7 +91,7 @@ router.get(
         try {
             const { limit, sortByFitness } = req.query as Record<string, string>;
             const organisms = await findOrganismsByGeneration(req.params.generationId, {
-                limit:         limit         ? Number(limit) : undefined,
+                limit:         limit ? Number(limit) : 200,
                 sortByFitness: sortByFitness === 'true',
             });
             res.json({ success: true, data: organisms } satisfies ApiResponse<IOrganism[]>);
