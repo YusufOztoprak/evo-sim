@@ -241,11 +241,13 @@ router.post(
     [param('id').isMongoId(), handleValidationErrors],
     async (req: Request, res: Response, next: NextFunction) => {
         try {
+            console.log(`[start] fetching sim ${req.params.id}`);
             const sim = await findSimulationById(req.params.id);
             if (!sim) throw new AppError(404, 'Simulation not found');
             if (sim.status === 'running')   throw new AppError(409, 'Simulation is already running');
             if (sim.status === 'completed') throw new AppError(409, 'Simulation has already completed');
 
+            console.log(`[start] status=${sim.status} fitnessFn=${sim.config.fitnessFunctionId} popSize=${sim.config.populationSize}`);
             await updateSimulationStatus(sim._id, 'running');
 
             // Resolve dynamic env config: generate keyframes if enabled but not yet populated
@@ -261,6 +263,7 @@ router.post(
                 };
             }
 
+            console.log(`[start] calling createInitialPopulation`);
             // ── Generation 0 — create, speciate, and persist before the loop ──
             let population  = createInitialPopulation(cfg);
             let generation  = 0;
